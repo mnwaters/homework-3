@@ -1,0 +1,124 @@
+# Homework 3
+
+Read in dataset
+
+```{r}
+load("hw2_list.rda")
+```
+
+Create objects
+
+```{r}
+t_df <- bp_list$treatment
+p_df <- bp_list$placebo
+```
+
+## Task 1
+
+1.  Add new status column to both data frames within the bp_list
+
+```{r}
+bp_list$treatment$status <- character(20) 
+```
+
+```{r}
+bp_list$placebo$status <- character(10) 
+```
+
+2.  Add values to new 'status' columns
+
+```{r}
+t_df$status <- ifelse(t_df$post_bp <= 120,"Optimal",
+                               ifelse(t_df$post_bp>120 & t_df$post_bp <=130, "Borderline",
+                                      ifelse(t_df$post_bp>130, "High",NA)))
+```
+
+```{r}
+p_df$status <- ifelse(p_df$post_bp <= 120,"Optimal",
+                               ifelse(p_df$post_bp>120 & p_df$post_bp <=130, "Borderline",
+                                      ifelse(p_df$post_bp>130, "High",NA)))
+
+```
+
+## Task 2
+
+1.Create a function a. takes in a list with two data frames in it (a treatment and a placebo data frame) as an argument.
+
+```{r}
+sum_stat <- function(data_list) {
+  treatment <- data_list$treatment
+  placebo <- data_list$placebo
+}
+```
+
+b.  takes in an R function (that would find a summary of a numeric column) with the default value being set to "mean" (notice this is a quoted string).
+
+```{r}
+sum_stat <- function(data_list, stat = "mean") {
+  treatment <- data_list$treatment
+  placebo <- data_list$placebo
+}
+```
+
+c.  Finds the statistic of interest (as defined by the user input) for the pre, post, and diff columns of both data frames. – Use my_fun \<- get(stat) within the function to get the function from the quoted string.
+
+```{r}
+sum_stat <- function(data_list, stat = "mean") {
+  treatment <- data_list$treatment
+  placebo <- data_list$placebo
+my_fun <- get(stat)
+  treatment_pre <- my_fun(treatment$pre)
+  treatment_post <- my_fun(treatment$post)
+  treatment_diff <- my_fun(treatment$diff)
+  
+  placebo_pre <- my_fun(placebo$pre)
+  placebo_post <- my_fun(placebo$post)
+  placebo_diff <- my_fun(placebo$diff)
+}
+```
+
+d.  These six values should then be returned as a named list with meaningful names - this is a somewhat challenging part!
+
+```{r}
+sum_stat <- function(data_list, stat = "mean") {
+  treatment <- data_list$treatment
+  placebo <- data_list$placebo
+my_fun <- get(stat)
+  treatment_pre <- my_fun(treatment$pre)
+  treatment_post <- my_fun(treatment$post)
+  treatment_diff <- my_fun(treatment$diff)
+  
+  placebo_pre <- my_fun(placebo$pre)
+  placebo_post <- my_fun(placebo$post)
+  placebo_diff <- my_fun(placebo$diff)
+  
+  values <- c(treatment_pre, treatment_post, treatment_diff, placebo_pre, placebo_post, placebo_diff)
+  
+  names(values) <- c(paste0("treatment_", c("pre_", "post_", "diff_"), stat),
+                     paste0("placebo_", c("pre_", "post_", "diff_"), stat))
+  
+    return(values)
+}
+```
+
+e.  Finally, apply your function to you list of data frames from previous. Use it without specifying your statistic, with specifying your statistic as "var", "sd", "min", and "max".
+
+```{r}
+sum_stat(bp_list)
+```
+
+```{r}
+sum_stat(bp_list, stat = "var")
+```
+
+```{r}
+sum_stat(bp_list, stat = "sd")
+```
+
+```{r}
+sum_stat(bp_list, stat = "min")
+```
+
+```{r}
+sum_stat(bp_list, stat = "max")
+```
